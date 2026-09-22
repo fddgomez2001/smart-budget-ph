@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PINoyHub — Smart Budget</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/home/runner/work/smart-budget-ph/smart-budget-ph/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <section id="onboarding" class="card">
+        <h1>Let’s build your budget 💰</h1>
+        <p class="muted">Tell us about your income and regular expenses.</p>
+        <div class="grid two">
+          <label>
+            How much do you earn?
+            <input id="incomeAmount" type="number" min="0" step="0.01" placeholder="0.00" />
+          </label>
+          <label>
+            How often do you receive your income?
+            <select id="incomeFrequency">
+              <option value="monthly">Monthly</option>
+              <option value="twice_month">Twice a month</option>
+              <option value="biweekly">Every 2 weeks</option>
+              <option value="weekly">Weekly</option>
+              <option value="irregular">Irregular</option>
+            </select>
+          </label>
+        </div>
+        <div class="grid two">
+          <label id="manualMonthlyWrap" class="hidden">
+            Estimated monthly income
+            <input id="manualMonthlyIncome" type="number" min="0" step="0.01" placeholder="0.00" />
+          </label>
+          <label>
+            Last payday date
+            <input id="lastPayday" type="date" />
+          </label>
+        </div>
+        <p id="monthlyEstimate" class="highlight">Estimated monthly income: ₱0.00</p>
+        <button id="startBudget" class="btn primary">Start Smart Budget</button>
+      </section>
+
+      <section id="dashboard" class="hidden">
+        <header class="hero card" id="home">
+          <h2>GOOD MORNING! 👋</h2>
+          <p class="muted">Your money at a glance</p>
+          <div class="money-card">
+            <p class="label">MONTHLY INCOME</p>
+            <h3 id="monthlyIncomeDisplay">₱0.00</h3>
+            <p>Committed: <span id="committedDisplay">₱0.00</span></p>
+            <p>Available: <span id="availableDisplay">₱0.00</span></p>
+            <p class="muted">Money left after planned expenses</p>
+          </div>
+          <div class="quick-actions">
+            <button class="btn" data-open="expenseModal">+ Add Expense</button>
+            <button class="btn" data-open="incomeModal">+ Add Income</button>
+            <button class="btn" data-open="billModal">+ Add Bill</button>
+            <button class="btn" data-open="goalModal">+ Add Goal</button>
+          </div>
+        </header>
+
+        <section class="card" id="budget">
+          <div class="row between align-start">
+            <div>
+              <h3>Your Suggested Budget</h3>
+              <p class="muted">Suggested starting allocation</p>
+            </div>
+          </div>
+          <div class="grid three" id="allocationInputs"></div>
+          <h4>Budget progress</h4>
+          <div id="progressList" class="stack"></div>
+        </section>
+
+        <section class="card">
+          <h3>🙏 Giving / Tithes &amp; Offering</h3>
+          <p class="muted">10% suggested allocation</p>
+          <div class="grid three">
+            <label><input type="checkbox" id="givingEnabled" checked /> Enable giving</label>
+            <label>Mode
+              <select id="givingMode">
+                <option value="percentage">Percentage</option>
+                <option value="fixed">Custom amount</option>
+              </select>
+            </label>
+            <label id="givingPercentWrap">Percentage
+              <input id="givingPercentage" type="number" min="0" max="100" step="0.1" value="10" />
+            </label>
+            <label id="givingAmountWrap" class="hidden">Custom amount
+              <input id="givingFixedAmount" type="number" min="0" step="0.01" value="0" />
+            </label>
+          </div>
+          <p>Giving amount: <strong id="givingAmountDisplay">₱0.00</strong></p>
+        </section>
+
+        <section class="card">
+          <div class="row between">
+            <h3>Essential expenses</h3>
+            <button class="btn" data-open="recurringExpenseModal">+ Add Expense</button>
+          </div>
+          <div id="recurringExpenseList"></div>
+        </section>
+
+        <section class="card">
+          <h3>Transactions</h3>
+          <div class="grid three">
+            <label>Search
+              <input id="txSearch" type="text" placeholder="Search transactions" />
+            </label>
+            <label>Filter period
+              <select id="txPeriod">
+                <option value="week">This Week</option>
+                <option value="month" selected>This Month</option>
+                <option value="lastMonth">Last Month</option>
+                <option value="custom">Custom Range</option>
+              </select>
+            </label>
+            <div class="grid two hidden" id="customRange">
+              <label>From<input id="txFrom" type="date" /></label>
+              <label>To<input id="txTo" type="date" /></label>
+            </div>
+          </div>
+          <div id="transactionList"></div>
+        </section>
+
+        <section class="card" id="bills">
+          <div class="row between">
+            <h3>💳 Upcoming Bills</h3>
+            <button class="btn" data-open="billModal">+ Add Bill</button>
+          </div>
+          <p class="muted">Demo records included. Add your own bills manually.</p>
+          <div id="billList"></div>
+        </section>
+
+        <section class="card" id="goals">
+          <div class="row between">
+            <h3>🎯 My Goals</h3>
+            <button class="btn" data-open="goalModal">+ Add Goal</button>
+          </div>
+          <div id="goalList"></div>
+        </section>
+
+        <section class="card">
+          <h3>🛡️ Emergency Fund</h3>
+          <div class="grid two">
+            <label>Target
+              <input id="emergencyTarget" type="number" min="0" step="0.01" />
+            </label>
+            <div>
+              <p>Current: <span id="emergencyCurrent">₱0.00</span></p>
+              <p>Target: <span id="emergencyTargetDisplay">₱0.00</span></p>
+              <p>Progress: <span id="emergencyProgress">0%</span></p>
+            </div>
+          </div>
+          <div class="progress"><div id="emergencyBar"></div></div>
+        </section>
+
+        <section class="card">
+          <h3>📅 Next Payday</h3>
+          <p><strong id="nextPaydayDate">-</strong></p>
+          <p>Days remaining: <span id="daysToPayday">0</span></p>
+          <p>Estimated available spending until payday: <span id="untilPaydayAvailable">₱0.00</span></p>
+        </section>
+
+        <section class="card">
+          <h3>This Week</h3>
+          <div id="weeklyChart"></div>
+          <p>Weekly Total: <strong id="weeklyTotal">₱0.00</strong></p>
+          <p>Average Daily Spending: <strong id="weeklyAverage">₱0.00</strong></p>
+        </section>
+
+        <section class="card">
+          <h3>Category Breakdown</h3>
+          <select id="breakdownPeriod">
+            <option value="week">This Week</option>
+            <option value="month" selected>This Month</option>
+            <option value="lastMonth">Last Month</option>
+            <option value="custom">Custom Range</option>
+          </select>
+          <div id="breakdown"></div>
+        </section>
+
+        <section class="card">
+          <h3>Can I afford this? 🤔</h3>
+          <div class="grid two">
+            <label>What do you want to buy?
+              <input id="affordName" type="text" placeholder="Shoes" />
+            </label>
+            <label>How much?
+              <input id="affordAmount" type="number" min="0" step="0.01" placeholder="0.00" />
+            </label>
+          </div>
+          <button class="btn primary" id="checkAffordability">Check</button>
+          <p id="affordResult" class="muted"></p>
+          <div class="row">
+            <button class="btn">Save for it</button>
+            <button class="btn">Adjust budget</button>
+            <button class="btn">Add to wishlist</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>💡 Smart Insights</h3>
+          <ul id="insights"></ul>
+        </section>
+
+        <section class="card" id="profile">
+          <h3>Incomes</h3>
+          <div id="incomeList"></div>
+          <h3>Reminders</h3>
+          <button class="btn" data-open="reminderModal">+ Add Reminder</button>
+          <div id="reminderList"></div>
+        </section>
+      </section>
+
+      <nav class="mobile-nav">
+        <a href="#home">Home</a>
+        <a href="#budget">Budget</a>
+        <a href="#bills">Bills</a>
+        <a href="#goals">Goals</a>
+        <a href="#profile">Profile</a>
+      </nav>
+    </div>
+
+    <dialog id="expenseModal" class="modal">
+      <form method="dialog" id="expenseForm">
+        <h3>Add Expense</h3>
+        <label>Amount<input name="amount" type="number" min="0" step="0.01" required /></label>
+        <label>Category
+          <select name="category"></select>
+        </label>
+        <label>Date<input name="date" type="date" required /></label>
+        <label>Notes<input name="notes" type="text" /></label>
+        <div class="row end"><button class="btn" value="cancel">Cancel</button><button class="btn primary" value="default">Save</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="incomeModal" class="modal">
+      <form method="dialog" id="incomeForm">
+        <h3>Add Income</h3>
+        <label>Type
+          <select name="type">
+            <option>Salary</option><option>Freelance</option><option>Business</option><option>Commission</option><option>Allowance</option><option>Bonus</option><option>Other</option>
+          </select>
+        </label>
+        <label>Amount<input name="amount" type="number" min="0" step="0.01" required /></label>
+        <label>Frequency
+          <select name="frequency"><option value="monthly">Monthly</option><option value="twice_month">Twice a month</option><option value="biweekly">Every 2 weeks</option><option value="weekly">Weekly</option><option value="irregular">Irregular</option></select>
+        </label>
+        <label>Manual monthly (for irregular)<input name="manualMonthly" type="number" min="0" step="0.01" /></label>
+        <div class="row end"><button class="btn" value="cancel">Cancel</button><button class="btn primary" value="default">Save</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="recurringExpenseModal" class="modal">
+      <form method="dialog" id="recurringExpenseForm">
+        <h3>Add Recurring Expense</h3>
+        <label>Name<input name="name" type="text" required /></label>
+        <label>Amount<input name="amount" type="number" min="0" step="0.01" required /></label>
+        <label>Frequency
+          <select name="frequency"><option value="monthly">Monthly</option><option value="twice_month">Twice a month</option><option value="biweekly">Every 2 weeks</option><option value="weekly">Weekly</option></select>
+        </label>
+        <label>Category
+          <select name="category"></select>
+        </label>
+        <div class="row end"><button class="btn" value="cancel">Cancel</button><button class="btn primary" value="default">Save</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="billModal" class="modal">
+      <form method="dialog" id="billForm">
+        <h3>Add Bill</h3>
+        <label>Provider<input name="provider" type="text" required /></label>
+        <label>Amount<input name="amount" type="number" min="0" step="0.01" required /></label>
+        <label>Due Date<input name="dueDate" type="date" required /></label>
+        <label>Type
+          <select name="frequency"><option value="recurring">Recurring</option><option value="one_time">One-time</option></select>
+        </label>
+        <label>Status
+          <select name="status"><option>Upcoming</option><option>Paid</option><option>Overdue</option></select>
+        </label>
+        <div class="row end"><button class="btn" value="cancel">Cancel</button><button class="btn primary" value="default">Save</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="goalModal" class="modal">
+      <form method="dialog" id="goalForm">
+        <h3>Add Savings Goal</h3>
+        <label>Goal Name<input name="name" type="text" required /></label>
+        <label>Target Amount<input name="target" type="number" min="0" step="0.01" required /></label>
+        <label>Current Savings<input name="current" type="number" min="0" step="0.01" required /></label>
+        <label>Target Date<input name="targetDate" type="date" required /></label>
+        <div class="row end"><button class="btn" value="cancel">Cancel</button><button class="btn primary" value="default">Save</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="reminderModal" class="modal">
+      <form method="dialog" id="reminderForm">
+        <h3>Add Reminder</h3>
+        <label>Title<input name="title" type="text" required /></label>
+        <label>Date<input name="date" type="date" required /></label>
+        <label>Notes<input name="notes" type="text" /></label>
+        <div class="row end"><button class="btn" value="cancel">Cancel</button><button class="btn primary" value="default">Save</button></div>
+      </form>
+    </dialog>
+
+    <script src="/home/runner/work/smart-budget-ph/smart-budget-ph/app.js"></script>
+  </body>
+</html>
