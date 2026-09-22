@@ -127,7 +127,8 @@ function filteredTransactions(period = state.filters.txPeriod) {
 
 function committedTotal() {
   const a = state.allocations;
-  return givingAmount() + recurringTotal() + num(a.savings) + num(a.emergency) + num(a.personal) + num(a.goals);
+  const plannedNeeds = Math.max(recurringTotal(), num(a.needs));
+  return givingAmount() + plannedNeeds + num(a.savings) + num(a.emergency) + num(a.personal) + num(a.goals);
 }
 
 function remainingBudget() {
@@ -385,6 +386,7 @@ function openModal(id) {
 }
 
 function editWithPrompts(item, fields, onSave) {
+  if (!item) return;
   const updates = { ...item };
   for (const f of fields) {
     const next = prompt(f.label, updates[f.key] ?? '');

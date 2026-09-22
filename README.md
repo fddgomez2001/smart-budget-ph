@@ -4,7 +4,7 @@ Interactive **PINoyHub Smart Budget** module built with vanilla HTML, CSS, and J
 
 ## Run locally
 
-Open `/home/runner/work/smart-budget-ph/smart-budget-ph/index.html` in a browser.
+Open `index.html` in a browser.
 
 ## Features
 
